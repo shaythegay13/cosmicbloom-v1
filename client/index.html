@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm & Give - Community Garden Adventure</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-content">
+            <h1>🌱 Farm & Give</h1>
+            <div class="loading-spinner"></div>
+            <p>Loading your farm...</p>
+        </div>
+    </div>
+
+    <!-- Login/Register Screen -->
+    <div id="auth-screen" class="screen">
+        <div class="auth-container">
+            <h1>🌱 Farm & Give</h1>
+            <p class="tagline">Farm around the world, support local gardens</p>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="error-message" id="login-error"></p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <input type="text" id="register-username" placeholder="Username" required minlength="3" maxlength="20">
+                <input type="email" id="register-email" placeholder="Email" required>
+                <input type="password" id="register-password" placeholder="Password" required minlength="6">
+                <button type="submit" class="btn-primary">Register</button>
+                <p class="error-message" id="register-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Character Selection Screen -->
+    <div id="character-screen" class="screen">
+        <div class="character-container">
+            <h1>Choose Your Farmer</h1>
+            <p class="subtitle">Each character has unique farming abilities</p>
+            
+            <div id="character-grid" class="character-grid">
+                <!-- Characters will be loaded dynamically -->
+            </div>
+
+            <button id="confirm-character-btn" class="btn-primary" disabled>Start Farming</button>
+        </div>
+    </div>
+
+    <!-- Main Game Screen -->
+    <div id="game-screen" class="screen">
+        <!-- Top HUD -->
+        <div class="hud-top">
+            <div class="hud-left">
+                <div class="stat-item">
+                    <span class="stat-icon">👤</span>
+                    <span id="player-name">Player</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⭐</span>
+                    <span>Lv. <span id="player-level">1</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💰</span>
+                    <span id="player-coins">100</span>
+                </div>
+            </div>
+            <div class="hud-right">
+                <button id="shop-btn" class="icon-btn">🛒 Shop</button>
+                <button id="charity-btn" class="icon-btn">💚 Charity</button>
+                <button id="menu-btn" class="icon-btn">☰</button>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Bottom HUD -->
+        <div class="hud-bottom">
+            <div class="toolbar">
+                <button class="tool-btn active" data-tool="move">👋 Move</button>
+                <button class="tool-btn" data-tool="hoe">🔨 Till</button>
+                <button class="tool-btn" data-tool="plant">🌱 Plant</button>
+                <button class="tool-btn" data-tool="water">💧 Water</button>
+                <button class="tool-btn" data-tool="harvest">✂️ Harvest</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shop-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Farm Shop</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shop-tabs">
+                    <button class="shop-tab-btn active" data-category="seeds">Seeds</button>
+                    <button class="shop-tab-btn" data-category="tools">Tools</button>
+                    <button class="shop-tab-btn" data-category="decorations">Decorations</button>
+                </div>
+                <div id="shop-items" class="shop-grid">
+                    <!-- Shop items will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charity Modal -->
+    <div id="charity-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💚 Support Community Gardens</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="charity-info">
+                    <p><strong>10% of all purchases</strong> go to your selected community garden!</p>
+                    <div class="impact-stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="total-donated">$0</div>
+                            <div class="stat-label">Total Donated</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="my-contribution">$0</div>
+                            <div class="stat-label">Your Contribution</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Select Your Local Garden</h3>
+                <div class="charity-filters">
+                    <input type="text" id="charity-city" placeholder="City">
+                    <input type="text" id="charity-state" placeholder="State">
+                    <button id="search-charities-btn" class="btn-secondary">Search</button>
+                </div>
+                
+                <div id="charity-list" class="charity-list">
+                    <!-- Charities will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Modal -->
+    <div id="menu-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Menu</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <button id="save-game-btn" class="btn-primary full-width">💾 Save Game</button>
+                <button id="settings-btn" class="btn-secondary full-width">⚙️ Settings</button>
+                <button id="logout-btn" class="btn-secondary full-width">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/farming.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
