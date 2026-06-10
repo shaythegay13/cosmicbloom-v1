@@ -1,169 +1,61 @@
-# Farm & Give 🌱
+# 🌍 Farm & Give — Rewind the Planet
 
-A charming farming game where players choose from 5 unique characters and farm around the world. What makes this special: **10% of all profits go directly to local community gardens, urban farms, and agricultural initiatives.**
+A cozy farming game for iOS, Android and the web. Travel to seven regions
+around the world, start farms in each, and **rewind** worn-down landscapes
+back to life — barren dirt turns to lush meadow, dead trees bloom, and
+wildlife returns as you farm. **We donate 10% of our proceeds to real
+community gardens** that players pick in-game.
 
-**Now integrated with the [American Community Gardening Association (ACGA)](https://www.communitygarden.org)** - supporting real community gardens across the United States!
+## The game
 
-## 🎮 Game Features
+- 🗺️ **7 biomes**: Prairie Heartland → Old World Countryside → Misty Rice
+  Terraces → Golden Savanna → Emerald Rainforest → Red Earth Outback →
+  Aurora Tundra, each with native crops, ambient creatures and its own music
+- 🌿 **Restoration**: every harvest heals the region (native crops 1.5x);
+  the ground, trees, ambient light and wildlife visibly recover through
+  three tiers, with milestone rewards at 25/50/75/100%
+- 👩‍🌾 **5 farmers** with distinct abilities (faster growth, night yields,
+  richer soil, splash watering, bonus XP)
+- 📱 **Mobile-first**: tap-to-move with pathfinding, one-tap contextual farm
+  actions, haptics, portrait UI with safe-area support
+- 🔌 **Offline-first**: fully playable without a connection; saves sync
+  (last-write-wins) when you're back online; crops grow while you're away
+- 🪙 **Fair monetization**: optional consumable coin packs via native IAP
+  (RevenueCat). No ads, no tracking, no pay-to-win
 
-- **5 Unique Characters**: Choose your favorite farmer avatar
-- **Simple Pixel Art Style**: Inspired by games like Cosmic Coop
-- **Farming Mechanics**: Plant, water, harvest crops
-- **World Exploration**: Travel to different farming regions
-- **Community Impact**: 10% of profits support real ACGA-affiliated community gardens
-- **Real Gardens**: Choose from 15+ verified community garden organizations
+## Tech
 
-## 🛠️ Tech Stack
+| Layer | Stack |
+|---|---|
+| Game client | Vanilla JS ES modules + HTML5 Canvas, Vite |
+| Art | 100% generated pixel art — `npm run art` draws 434 sprites into atlases (see `ART_STYLE_GUIDE.md`) |
+| Audio | WebAudio: synthesized SFX + procedural per-biome music |
+| Mobile | Capacitor 8 (`ios/`, `android/`), RevenueCat IAP |
+| Backend | Node/Express + MongoDB (JWT auth, save sync, charity ledger, RevenueCat webhook) |
+| Tests/CI | Vitest (unit + supertest API tests), GitHub Actions with art-determinism gate |
 
-### Backend
-- Node.js + Express
-- MongoDB (Mongoose)
-- JWT Authentication
-- Stripe Payment Integration
+## Develop
 
-### Frontend
-- HTML5 Canvas for game rendering
-- Vanilla JavaScript (ES6+)
-- CSS3 for UI styling
-- Responsive design
-
-## 📦 Installation
-
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- npm or yarn
-
-### Setup Steps
-
-1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd windsurf-project
+npm install
+cp .env.example .env       # set MONGODB_URI etc.
+npm run seed               # seed community gardens (needs MongoDB)
+npm run dev                # API on :5000 + Vite client on :5173
 ```
 
-2. **Install dependencies**
-```bash
-npm run install-all
-```
+Other scripts: `npm run art` (regenerate atlases + icon/splash masters),
+`npm test`, `npm run client:build`, `npx cap run ios|android -l --external`
+(native live-reload).
 
-3. **Configure environment variables**
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+Debug atlas viewer: http://localhost:5173/debug/atlas-viewer.html
 
-4. **Start MongoDB** (if running locally)
-```bash
-mongod
-```
+## Ship it
 
-5. **Run the application**
+- `STORE_SUBMISSION_CHECKLIST.md` — every step to the App Store & Play Store
+- `QA_CHECKLIST.md` — device test pass before each submission
+- `APP_STORE_LAUNCH_PLAN.md` — the full phased roadmap this repo followed
+- `render.yaml` — one-click backend deploy (Render + MongoDB Atlas)
 
-Development mode (with auto-reload):
-```bash
-npm run dev
-```
+## License
 
-Production mode:
-```bash
-npm start
-```
-
-The server will run on `http://localhost:5000`
-
-## 🎯 Game Mechanics
-
-### Characters
-1. **Sunny** - The optimistic farmer
-2. **Luna** - The night gardener
-3. **Terra** - The earth whisperer
-4. **River** - The water keeper
-5. **Sage** - The wise cultivator
-
-### Farming System
-- Plant seeds in tilled soil
-- Water crops daily
-- Harvest when ready
-- Sell produce for coins
-- Unlock new areas and crops
-
-### Charity System
-- 10% of all in-game purchases
-- Automatically tracked and allocated
-- Users can select their local community garden
-- Quarterly distributions to registered organizations
-
-## 📁 Project Structure
-
-```
-windsurf-project/
-├── server/
-│   ├── index.js              # Express server entry point
-│   ├── config/               # Configuration files
-│   ├── models/               # MongoDB models
-│   ├── routes/               # API routes
-│   ├── controllers/          # Route controllers
-│   ├── middleware/           # Custom middleware
-│   └── utils/                # Utility functions
-├── client/
-│   ├── index.html            # Main HTML file
-│   ├── css/
-│   │   └── styles.css        # Game styling
-│   ├── js/
-│   │   ├── game.js           # Main game engine
-│   │   ├── player.js         # Player class
-│   │   ├── world.js          # World/map system
-│   │   ├── farming.js        # Farming mechanics
-│   │   ├── ui.js             # UI components
-│   │   └── api.js            # API client
-│   └── assets/
-│       ├── sprites/          # Character and object sprites
-│       └── audio/            # Sound effects and music
-├── package.json
-├── .env.example
-└── README.md
-```
-
-## 🔐 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-
-### Game
-- `GET /api/game/characters` - Get all characters
-- `POST /api/game/save` - Save game progress
-- `GET /api/game/load` - Load game progress
-
-### Payments
-- `POST /api/payments/create-intent` - Create payment intent
-- `GET /api/payments/history` - Get payment history
-
-### Charity
-- `GET /api/charity/organizations` - Get community gardens list
-- `POST /api/charity/select` - Select user's local garden
-- `GET /api/charity/impact` - Get charity impact stats
-
-## 🌍 Community Impact
-
-This game is built on the principle of giving back. Every purchase made in-game contributes to real-world community gardens and urban farms, helping to:
-
-- Support local food production
-- Create green spaces in urban areas
-- Educate communities about sustainable farming
-- Provide fresh produce to underserved neighborhoods
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-MIT License - feel free to use this project for learning or commercial purposes.
-
-## 🙏 Acknowledgments
-
-- Inspired by Cosmic Coop's simple, charming aesthetic
-- Built with love for farming and community support
+MIT
