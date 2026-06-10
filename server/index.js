@@ -84,6 +84,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Farm & Give API is running' });
 });
 
+// Legal pages (required links for both app stores)
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(clientDir, 'legal/privacy.html'));
+});
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(clientDir, 'legal/terms.html'));
+});
+
 // Serve index.html for all other routes (SPA support)
 app.get('*', (req, res) => {
   res.sendFile(path.join(clientDir, 'index.html'));
