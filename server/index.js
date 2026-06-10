@@ -20,14 +20,49 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
+app.use(helmet({
+  contentSecurityPolicy: false // the game client inlines canvas-drawn assets
 }));
-app.use(morgan('dev'));
-app.use(express.json());
+
+// Allowed origins: the hosted web client + Capacitor app schemes
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5000',
+  'capacitor://localhost',
+  'https://localhost',
+  'ionic://localhost'
+].filter(Boolean);
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(null, false);
+  },
+  credentials: true,
+  exposedHeaders: ['X-Refreshed-Token']
+}));
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
+app.use(express.json({ limit: '400kb' })); // save snapshots cap at 300kb
 app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting: tight on auth (credential stuffing), generous elsewhere
+const rateLimit = require('express-rate-limit');
+app.set('trust proxy', 1); // behind Render/Railway proxy
+app.use('/api/auth', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false
+}));
+app.use('/api', rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 600,
+  standardHeaders: true,
+  legacyHeaders: false
+}));
 
 // Serve the Vite build output (www) when present, otherwise the raw client
 // directory. In development the client is served by Vite (npm run client:dev)

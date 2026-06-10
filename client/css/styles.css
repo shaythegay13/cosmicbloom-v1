@@ -372,6 +372,19 @@ html, body {
 .unlock-cost { font-weight: 900; color: #8a6510; margin: 12px 0; }
 
 /* menu */
+.btn-danger {
+    padding: 14px 22px;
+    border: none; border-radius: 14px;
+    font-size: 0.95rem; font-weight: 800; cursor: pointer;
+    background: #fbeaea; color: #b03030;
+    box-shadow: 0 4px 0 #e0c0c0;
+}
+.btn-danger:active { transform: translateY(3px); box-shadow: 0 1px 0 #e0c0c0; }
+.legal-links {
+    text-align: center; padding: 10px 0;
+    font-size: 0.8rem; color: var(--brown-soft);
+}
+.legal-links a { color: var(--brown-soft); }
 .setting-row {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 4px; font-weight: 700;

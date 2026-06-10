@@ -110,23 +110,22 @@ export class API {
         return this.request('/charity/my-impact');
     }
 
-    // Payment endpoints
-    async createPaymentIntent(amount, items) {
-        return this.request('/payments/create-intent', {
-            method: 'POST',
-            body: JSON.stringify({ amount, items })
-        });
-    }
-
-    async confirmPayment(transactionId, paymentIntentId) {
-        return this.request('/payments/confirm', {
-            method: 'POST',
-            body: JSON.stringify({ transactionId, paymentIntentId })
-        });
+    // Payment endpoints (purchases happen natively via RevenueCat;
+    // /sync claims server-credited coins into the local save)
+    async syncPurchases() {
+        return this.request('/payments/sync', { method: 'POST' });
     }
 
     async getPaymentHistory() {
         return this.request('/payments/history');
+    }
+
+    // Account deletion (App Store Guideline 5.1.1(v))
+    async deleteAccount(password) {
+        return this.request('/auth/me', {
+            method: 'DELETE',
+            body: JSON.stringify({ password })
+        });
     }
 }
 
