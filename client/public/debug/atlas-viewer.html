@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Farm & Give — Atlas Viewer (debug)</title>
+<style>
+  body { background:#3a4252; color:#eee; font-family:monospace; margin:16px; }
+  h2 { color:#f2c94c; margin:24px 0 8px; }
+  .sheet { display:flex; flex-wrap:wrap; gap:6px; }
+  .cell { background:#5a6478; border-radius:4px; padding:4px; text-align:center; }
+  .cell canvas { image-rendering: pixelated; display:block; margin:0 auto; }
+  .cell div { font-size:9px; max-width:80px; overflow:hidden; color:#cdd5e0; }
+</style>
+</head>
+<body>
+<h1>Atlas Viewer</h1>
+<div id="root">loading…</div>
+<script>
+const ATLASES = ['core','biome-prairie','biome-countryside','biome-terraces',
+  'biome-savanna','biome-rainforest','biome-outback','biome-tundra'];
+const root = document.getElementById('root');
+(async () => {
+  root.textContent = '';
+  for (const name of ATLASES) {
+    const meta = await (await fetch(`/atlases/${name}.json`)).json();
+    const img = new Image();
+    img.src = `/atlases/${name}.png`;
+    await img.decode();
+    const h2 = document.createElement('h2');
+    h2.textContent = `${name} — ${Object.keys(meta.frames).length} frames`;
+    root.appendChild(h2);
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+    for (const [frame, f] of Object.entries(meta.frames)) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const c = document.createElement('canvas');
+      c.width = f.w; c.height = f.h;
+      c.style.width = f.w + 'px'; c.style.height = f.h + 'px';
+      c.getContext('2d').drawImage(img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h);
+      const label = document.createElement('div');
+      label.textContent = frame;
+      cell.appendChild(c); cell.appendChild(label);
+      sheet.appendChild(cell);
+    }
+    root.appendChild(sheet);
+  }
+})();
+</script>
+</body>
+</html>
