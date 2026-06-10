@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Farm &amp; Give</string>
+    <string name="title_activity_main">Farm &amp; Give</string>
+    <string name="package_name">com.farmandgive.app</string>
+    <string name="custom_url_scheme">com.farmandgive.app</string>
+</resources>

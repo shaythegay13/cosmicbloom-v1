@@ -5,10 +5,13 @@ import { Game } from './game.js';
 import { Tutorial } from './tutorial.js';
 import { defaultState, migrateLegacy } from './player.js';
 import { loadLocal, pickNewer, clearLocal, saveLocal, flushLocal } from './storage.js';
+import { initNativeStorage, initNativeLifecycle } from './native.js';
+import { initIap } from './iap.js';
 
 let game = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initNativeStorage();
     const token = localStorage.getItem('token');
     const localSave = await loadLocal();
 
@@ -128,6 +131,11 @@ async function startGame(userData, save) {
 
     new Tutorial(game).start();
     setupGameHandlers();
+
+    await initNativeLifecycle(game, ui);
+    if (userData.id || userData._id) {
+        initIap(game, ui, String(userData.id || userData._id));
+    }
 }
 
 function setupGameHandlers() {
