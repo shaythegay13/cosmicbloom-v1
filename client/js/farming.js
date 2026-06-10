@@ -1,5 +1,7 @@
 // Farming mechanics for Farm & Give
-class FarmingSystem {
+import { TILE_SIZE } from './config.js';
+
+export class FarmingSystem {
     constructor(world, player) {
         this.world = world;
         this.player = player;
@@ -233,15 +235,15 @@ class FarmingSystem {
             const [x, y] = key.split(',').map(Number);
             const cropDef = this.cropTypes[crop.type];
             
-            const screenX = (x - camera.x) * 32;
-            const screenY = (y - camera.y) * 32;
+            const screenX = (x - camera.x) * TILE_SIZE;
+            const screenY = (y - camera.y) * TILE_SIZE;
 
             // Draw crop emoji
             const emoji = cropDef.emoji[crop.stage] || cropDef.emoji[0];
             ctx.font = '24px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(emoji, screenX + 16, screenY + 16);
+            ctx.fillText(emoji, screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2);
 
             // Draw water indicator
             if (crop.needsWater) {

@@ -1,9 +1,11 @@
 // World and Map system for Farm & Give
-class World {
+import { TILE_SIZE } from './config.js';
+
+export class World {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.tileSize = 32;
+        this.tileSize = TILE_SIZE;
         this.tiles = [];
         this.generateWorld();
     }
@@ -118,7 +120,7 @@ class World {
     }
 }
 
-class Camera {
+export class Camera {
     constructor(x, y, width, height) {
         this.x = x;
         this.y = y;
@@ -136,8 +138,8 @@ class Camera {
         this.y = Math.max(0, Math.min(this.y, worldHeight - this.height));
     }
 
-    update(canvas, world) {
-        this.width = Math.floor(canvas.width / 32);
-        this.height = Math.floor(canvas.height / 32);
+    update(viewWidth, viewHeight) {
+        this.width = Math.floor(viewWidth / TILE_SIZE);
+        this.height = Math.floor(viewHeight / TILE_SIZE);
     }
 }
