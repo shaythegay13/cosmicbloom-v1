@@ -1,260 +1,188 @@
-// Farming mechanics for Farm & Give
-import { TILE_SIZE } from './config.js';
+// Farming for one region: plots, growth, and the one-tap contextual action.
+// Plot shape (stored in state.farms[region].plots["x,y"]):
+//   { tilled: true, crop: { id, stage, stageStart, needsWater } | null }
+// Growth: watering starts a stage timer; when it elapses the crop advances
+// one stage and (if not final) thirsts again. On load, elapsed offline time
+// is applied the same way, so crops keep growing while the app is closed.
+import { getCrop, tierForScore } from './data/biomes.mjs';
+import { TILE_PX } from './config.js';
+import { addRestoration } from './restoration.js';
+
+export const FINAL_STAGE = 4;
 
 export class FarmingSystem {
-    constructor(world, player) {
+    constructor(game, biome, farm, world) {
+        this.game = game; // for state, audio, particles, events
+        this.biome = biome;
+        this.farm = farm;
         this.world = world;
-        this.player = player;
-        this.crops = new Map();
-        this.currentTool = 'move';
-        
-        // Crop definitions
-        this.cropTypes = {
-            carrot: {
-                name: 'Carrot',
-                seedId: 'carrot_seeds',
-                growthStages: 4,
-                growthTime: 30000, // 30 seconds per stage
-                sellPrice: 15,
-                emoji: ['🌱', '🌿', '🥬', '🥕']
-            },
-            tomato: {
-                name: 'Tomato',
-                seedId: 'tomato_seeds',
-                growthStages: 4,
-                growthTime: 40000,
-                sellPrice: 20,
-                emoji: ['🌱', '🌿', '🍃', '🍅']
-            },
-            wheat: {
-                name: 'Wheat',
-                seedId: 'wheat_seeds',
-                growthStages: 3,
-                growthTime: 25000,
-                sellPrice: 12,
-                emoji: ['🌱', '🌾', '🌾']
-            },
-            corn: {
-                name: 'Corn',
-                seedId: 'corn_seeds',
-                growthStages: 4,
-                growthTime: 35000,
-                sellPrice: 18,
-                emoji: ['🌱', '🌿', '🌽', '🌽']
+        farm.plots = farm.plots || {};
+        this._attachPlotsToTiles();
+        this.fastForward();
+    }
+
+    _attachPlotsToTiles() {
+        for (const key of Object.keys(this.farm.plots)) {
+            const [x, y] = key.split(',').map(Number);
+            const tile = this.world.tileAt(x, y);
+            if (tile && tile.type === 'grass') {
+                tile.plot = this.farm.plots[key];
+            } else {
+                delete this.farm.plots[key]; // plot no longer matches the map
             }
-        };
-
-        this.setupToolbar();
-    }
-
-    setupToolbar() {
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tool-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                e.target.classList.add('active');
-                this.currentTool = e.target.dataset.tool;
-            });
-        });
-    }
-
-    handleClick(tileX, tileY) {
-        const tile = this.world.getTile(tileX, tileY);
-        if (!tile) return;
-
-        switch (this.currentTool) {
-            case 'hoe':
-                this.tillSoil(tileX, tileY);
-                break;
-            case 'plant':
-                this.plantSeed(tileX, tileY);
-                break;
-            case 'water':
-                this.waterCrop(tileX, tileY);
-                break;
-            case 'harvest':
-                this.harvestCrop(tileX, tileY);
-                break;
         }
     }
 
-    tillSoil(x, y) {
-        if (this.world.tillSoil(x, y)) {
-            console.log('Tilled soil at', x, y);
-            this.player.addExperience(1);
-        }
+    plotAt(x, y) {
+        return this.farm.plots[`${x},${y}`] || null;
     }
 
-    plantSeed(x, y) {
-        const tile = this.world.getTile(x, y);
-        if (!tile || !tile.tilled || tile.crop) {
-            return;
-        }
-
-        // Check if player has seeds (for now, just plant carrots)
-        const cropType = 'carrot';
-        const crop = {
-            type: cropType,
-            stage: 0,
-            plantedAt: Date.now(),
-            wateredAt: null,
-            needsWater: true
-        };
-
-        tile.crop = crop;
-        const key = `${x},${y}`;
-        this.crops.set(key, crop);
-
-        console.log('Planted', cropType, 'at', x, y);
-        this.player.addExperience(2);
-    }
-
-    waterCrop(x, y) {
-        const tile = this.world.getTile(x, y);
-        if (!tile || !tile.crop) {
-            return;
-        }
-
-        if (tile.crop.needsWater) {
-            tile.crop.wateredAt = Date.now();
-            tile.crop.needsWater = false;
-            
-            let experience = 1;
-            
-            // River: Water efficiency 20% (chance to water adjacent crops)
-            if (this.player.selectedCharacter === 'river') {
-                // 20% chance to also water adjacent crops
-                if (Math.random() < 0.2) {
-                    const adjacent = [
-                        [x-1, y], [x+1, y], [x, y-1], [x, y+1]
-                    ];
-                    adjacent.forEach(([ax, ay]) => {
-                        const adjTile = this.world.getTile(ax, ay);
-                        if (adjTile && adjTile.crop && adjTile.crop.needsWater) {
-                            adjTile.crop.wateredAt = Date.now();
-                            adjTile.crop.needsWater = false;
-                            console.log('River bonus: Also watered crop at', ax, ay);
-                        }
-                    });
-                }
+    // Apply elapsed real time to all crops (called on load/resume)
+    fastForward(now = Date.now()) {
+        for (const plot of Object.values(this.farm.plots)) {
+            const crop = plot.crop;
+            if (!crop || crop.needsWater || crop.stage >= FINAL_STAGE) continue;
+            const def = getCrop(this.biome.id, crop.id);
+            if (!def) { plot.crop = null; continue; }
+            if (now - crop.stageStart >= this._growMs(def)) {
+                crop.stage++;
+                crop.stageStart = now;
+                if (crop.stage < FINAL_STAGE) crop.needsWater = true;
             }
-            
-            console.log('Watered crop at', x, y);
-            this.player.addExperience(experience);
         }
     }
 
-    harvestCrop(x, y) {
-        const tile = this.world.getTile(x, y);
-        if (!tile || !tile.crop) {
-            return;
-        }
-
-        const crop = tile.crop;
-        const cropDef = this.cropTypes[crop.type];
-
-        // Check if crop is fully grown
-        if (crop.stage >= cropDef.growthStages - 1) {
-            // Calculate sell price with character bonuses
-            let sellPrice = cropDef.sellPrice;
-            let experience = 5;
-            
-            // Luna: Night crops yield double (6 PM to 6 AM)
-            const hour = new Date().getHours();
-            const isNight = hour >= 18 || hour < 6;
-            if (this.player.selectedCharacter === 'luna' && isNight) {
-                sellPrice = sellPrice * 2;
-                console.log('🌙 Luna night bonus: Double yield!');
-            }
-            
-            // Terra: Soil quality bonus 15% (more coins)
-            if (this.player.selectedCharacter === 'terra') {
-                sellPrice = Math.floor(sellPrice * 1.15);
-            }
-            
-            // Sage: Experience gain 25%
-            if (this.player.selectedCharacter === 'sage') {
-                experience = Math.floor(experience * 1.25);
-            }
-            
-            // Harvest the crop
-            this.player.addCoins(sellPrice);
-            this.player.addExperience(experience);
-            
-            console.log(`Harvested ${cropDef.name} for ${sellPrice} coins! (+${experience} XP)`);
-
-            // Remove crop
-            delete tile.crop;
-            const key = `${x},${y}`;
-            this.crops.delete(key);
-        } else {
-            console.log('Crop is not ready to harvest yet');
-        }
+    _growMs(def) {
+        // Sunny's ability: everything grows 10% faster
+        const mult = this.game.state.character === 'sunny' ? 0.9 : 1;
+        return def.growMs * mult;
     }
 
     update() {
-        const now = Date.now();
-
-        this.crops.forEach((crop, key) => {
-            const [x, y] = key.split(',').map(Number);
-            const cropDef = this.cropTypes[crop.type];
-
-            // Check if crop should grow
-            if (!crop.needsWater && crop.wateredAt) {
-                const timeSincePlanted = now - crop.plantedAt;
-                
-                // Apply character bonuses
-                let stageTime = cropDef.growthTime;
-                
-                // Sunny: Crops grow 10% faster
-                if (this.player.selectedCharacter === 'sunny') {
-                    stageTime = stageTime * 0.9; // 10% faster
-                }
-                
-                const newStage = Math.min(
-                    Math.floor(timeSincePlanted / stageTime),
-                    cropDef.growthStages - 1
-                );
-
-                if (newStage > crop.stage) {
-                    crop.stage = newStage;
-                    console.log(`Crop at ${x},${y} grew to stage ${newStage}`);
-                    
-                    // Need water again for next stage
-                    if (crop.stage < cropDef.growthStages - 1) {
-                        crop.needsWater = true;
-                    }
-                }
-            }
-        });
+        this.fastForward();
     }
 
-    draw(ctx, camera) {
-        this.crops.forEach((crop, key) => {
-            const [x, y] = key.split(',').map(Number);
-            const cropDef = this.cropTypes[crop.type];
-            
-            const screenX = (x - camera.x) * TILE_SIZE;
-            const screenY = (y - camera.y) * TILE_SIZE;
-
-            // Draw crop emoji
-            const emoji = cropDef.emoji[crop.stage] || cropDef.emoji[0];
-            ctx.font = '24px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(emoji, screenX + TILE_SIZE / 2, screenY + TILE_SIZE / 2);
-
-            // Draw water indicator
-            if (crop.needsWater) {
-                ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-                ctx.fillRect(screenX + 2, screenY + 2, 6, 6);
-            }
-        });
+    // What would a tap on this tile do right now?
+    actionFor(x, y) {
+        const tile = this.world.tileAt(x, y);
+        if (!tile || tile.type !== 'grass') return null;
+        const plot = tile.plot;
+        if (!plot || !plot.tilled) return 'till';
+        if (!plot.crop) return 'plant';
+        if (plot.crop.stage >= FINAL_STAGE) return 'harvest';
+        if (plot.crop.needsWater) return 'water';
+        return null; // growing — nothing to do
     }
 
-    getCropAt(x, y) {
-        const key = `${x},${y}`;
-        return this.crops.get(key);
+    perform(action, x, y) {
+        switch (action) {
+            case 'till': return this._till(x, y);
+            case 'plant': return this._plant(x, y);
+            case 'water': return this._water(x, y);
+            case 'harvest': return this._harvest(x, y);
+        }
+        return false;
+    }
+
+    _till(x, y) {
+        const tile = this.world.tileAt(x, y);
+        if (!tile || tile.type !== 'grass' || (tile.plot && tile.plot.tilled)) return false;
+        const plot = { tilled: true, crop: null };
+        tile.plot = plot;
+        this.farm.plots[`${x},${y}`] = plot;
+        this.game.state.addXp(1);
+        this.game.fx('till', x, y);
+        this.game.emit('tilled', { x, y });
+        return true;
+    }
+
+    _plant(x, y) {
+        const plot = this.plotAt(x, y);
+        if (!plot || !plot.tilled || plot.crop) return false;
+        const seedId = this.game.state.selectedSeed;
+        const def = getCrop(this.biome.id, seedId);
+        if (!def) return false;
+        if (!this.game.state.takeSeed(seedId)) {
+            this.game.emit('noSeeds', { seedId });
+            return false;
+        }
+        plot.crop = { id: seedId, stage: 0, stageStart: Date.now(), needsWater: true };
+        this.game.state.addXp(2);
+        this.game.fx('plant', x, y);
+        this.game.emit('planted', { x, y, crop: seedId });
+        return true;
+    }
+
+    _water(x, y) {
+        const plot = this.plotAt(x, y);
+        if (!plot || !plot.crop || !plot.crop.needsWater) return false;
+        this._waterPlot(plot);
+        // River's ability: 20% chance to also water adjacent thirsty crops
+        if (this.game.state.character === 'river' && Math.random() < 0.2) {
+            for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                const adj = this.plotAt(x + dx, y + dy);
+                if (adj && adj.crop && adj.crop.needsWater) {
+                    this._waterPlot(adj);
+                    this.game.fx('water', x + dx, y + dy);
+                }
+            }
+        }
+        this.game.state.addXp(1);
+        this.game.fx('water', x, y);
+        this.game.emit('watered', { x, y });
+        return true;
+    }
+
+    _waterPlot(plot) {
+        plot.crop.needsWater = false;
+        plot.crop.stageStart = Date.now();
+    }
+
+    _harvest(x, y) {
+        const plot = this.plotAt(x, y);
+        if (!plot || !plot.crop || plot.crop.stage < FINAL_STAGE) return false;
+        const def = getCrop(this.biome.id, plot.crop.id);
+        let coins = def.sellPrice;
+        let xp = def.xp;
+        const state = this.game.state;
+
+        // Character abilities
+        const hour = new Date().getHours();
+        if (state.character === 'luna' && (hour >= 18 || hour < 6)) coins *= 2;
+        if (state.character === 'terra') coins = Math.floor(coins * 1.15);
+        if (state.character === 'sage') xp = Math.floor(xp * 1.25);
+
+        plot.crop = null;
+        state.addCoins(coins);
+        state.addXp(xp);
+
+        // Restoration: native crops heal the land fastest
+        const pts = def.restore * (def.native ? 1.5 : 1);
+        const result = addRestoration(this.farm, pts);
+        this.game.fx('harvest', x, y);
+        this.game.emit('harvested', { x, y, crop: def.id, coins, restoration: result });
+        return true;
+    }
+
+    draw(ctx, atlas, coreAtlas, camera, nowMs) {
+        const bob = Math.sin(nowMs / 280) * 3;
+        for (const key of Object.keys(this.farm.plots)) {
+            const [x, y] = key.split(',').map(Number);
+            const plot = this.farm.plots[key];
+            const s = camera.toScreen(x, y);
+            if (s.x < -TILE_PX || s.y < -TILE_PX || s.x > camera.wPx || s.y > camera.hPx) continue;
+            if (plot.tilled) {
+                const wet = plot.crop && !plot.crop.needsWater && plot.crop.stage < FINAL_STAGE;
+                atlas.draw(ctx, wet ? 'soil/wet' : 'soil/dry', s.x, s.y);
+            }
+            if (plot.crop) {
+                atlas.draw(ctx, `crop/${plot.crop.id}/${plot.crop.stage}`, s.x, s.y);
+                if (plot.crop.needsWater) {
+                    coreAtlas.draw(ctx, 'ind/water', s.x, s.y - TILE_PX * 0.7 + bob);
+                } else if (plot.crop.stage >= FINAL_STAGE) {
+                    coreAtlas.draw(ctx, 'ind/ready', s.x, s.y - TILE_PX * 0.7 + bob);
+                }
+            }
+        }
     }
 }
