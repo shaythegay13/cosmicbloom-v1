@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const connectDB = require('./config/database');
@@ -28,8 +29,14 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from client directory
-app.use(express.static(path.join(__dirname, '../client')));
+// Serve the Vite build output (www) when present, otherwise the raw client
+// directory. In development the client is served by Vite (npm run client:dev)
+// with /api proxied to this server.
+const builtClientDir = path.join(__dirname, '../www');
+const clientDir = fs.existsSync(builtClientDir)
+  ? builtClientDir
+  : path.join(__dirname, '../client');
+app.use(express.static(clientDir));
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -44,7 +51,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve index.html for all other routes (SPA support)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/index.html'));
+  res.sendFile(path.join(clientDir, 'index.html'));
 });
 
 // Error handling middleware

@@ -1,7 +1,9 @@
 // API Client for Farm & Give
-class API {
+import { API_BASE_URL } from './config.js';
+
+export class API {
     constructor() {
-        this.baseURL = window.location.origin + '/api';
+        this.baseURL = API_BASE_URL;
         this.token = localStorage.getItem('token');
     }
 
@@ -128,5 +130,5 @@ class API {
     }
 }
 
-// Create global API instance
-const api = new API();
+// Shared API instance
+export const api = new API();

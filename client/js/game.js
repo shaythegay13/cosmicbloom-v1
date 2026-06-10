@@ -1,38 +1,60 @@
 // Main Game Engine for Farm & Give
-class Game {
+import {
+    TILE_SIZE,
+    WORLD_WIDTH,
+    WORLD_HEIGHT,
+    AUTO_SAVE_INTERVAL_MS,
+    MAX_DEVICE_PIXEL_RATIO
+} from './config.js';
+import { api } from './api.js';
+import { ui } from './ui.js';
+import { Player } from './player.js';
+import { World, Camera } from './world.js';
+import { FarmingSystem } from './farming.js';
+
+export class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
         this.running = false;
         this.lastTime = 0;
-        
+
+        // Logical (CSS pixel) viewport size; the backing store is scaled
+        // by devicePixelRatio for crisp rendering on retina screens.
+        this.viewWidth = 0;
+        this.viewHeight = 0;
+
         // Game objects
         this.player = null;
         this.world = null;
         this.camera = null;
         this.farming = null;
-        
+
         // Input
         this.keys = {};
         this.mousePos = { x: 0, y: 0 };
-        
+
         // Auto-save
-        this.saveInterval = 30000; // Save every 30 seconds
+        this.saveInterval = AUTO_SAVE_INTERVAL_MS;
         this.lastSave = Date.now();
-        
+
         this.setupCanvas();
         this.setupInput();
     }
 
     setupCanvas() {
-        // Make canvas fill the available space
+        // CSS flexbox controls the canvas's displayed size; here we match
+        // the backing store to it (scaled by dpr) so drawing isn't stretched.
         const resizeCanvas = () => {
-            const container = this.canvas.parentElement;
-            this.canvas.width = container.clientWidth;
-            this.canvas.height = container.clientHeight - 120; // Account for HUD
-            
+            const dpr = Math.min(window.devicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO);
+            this.viewWidth = this.canvas.clientWidth;
+            this.viewHeight = this.canvas.clientHeight;
+            this.canvas.width = Math.round(this.viewWidth * dpr);
+            this.canvas.height = Math.round(this.viewHeight * dpr);
+            this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
             if (this.camera) {
-                this.camera.update(this.canvas, this.world);
+                this.camera.update(this.viewWidth, this.viewHeight);
             }
         };
 
@@ -81,8 +103,8 @@ class Game {
         if (!this.farming) return;
 
         // Convert screen coordinates to world coordinates
-        const tileX = Math.floor(this.camera.x + this.mousePos.x / 32);
-        const tileY = Math.floor(this.camera.y + this.mousePos.y / 32);
+        const tileX = Math.floor(this.camera.x + this.mousePos.x / TILE_SIZE);
+        const tileY = Math.floor(this.camera.y + this.mousePos.y / TILE_SIZE);
 
         this.farming.handleClick(tileX, tileY);
     }
@@ -92,12 +114,12 @@ class Game {
         this.player = new Player(playerData);
         
         // Create world
-        this.world = new World(30, 30);
-        
+        this.world = new World(WORLD_WIDTH, WORLD_HEIGHT);
+
         // Create camera
-        this.camera = new Camera(0, 0, 
-            Math.floor(this.canvas.width / 32),
-            Math.floor(this.canvas.height / 32)
+        this.camera = new Camera(0, 0,
+            Math.floor(this.viewWidth / TILE_SIZE),
+            Math.floor(this.viewHeight / TILE_SIZE)
         );
         
         // Create farming system
@@ -196,7 +218,7 @@ class Game {
     render() {
         // Clear canvas
         this.ctx.fillStyle = '#87CEEB';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.viewWidth, this.viewHeight);
 
         // Draw world
         this.world.draw(this.ctx, this.camera);
@@ -212,16 +234,16 @@ class Game {
     }
 
     drawCursor() {
-        const tileX = Math.floor(this.camera.x + this.mousePos.x / 32);
-        const tileY = Math.floor(this.camera.y + this.mousePos.y / 32);
-        
-        const screenX = (tileX - this.camera.x) * 32;
-        const screenY = (tileY - this.camera.y) * 32;
+        const tileX = Math.floor(this.camera.x + this.mousePos.x / TILE_SIZE);
+        const tileY = Math.floor(this.camera.y + this.mousePos.y / TILE_SIZE);
+
+        const screenX = (tileX - this.camera.x) * TILE_SIZE;
+        const screenY = (tileY - this.camera.y) * TILE_SIZE;
 
         // Draw highlight on hovered tile
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
         this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(screenX, screenY, 32, 32);
+        this.ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
     }
 
     async autoSave() {
@@ -277,6 +299,3 @@ class Game {
         }
     }
 }
-
-// Create global game instance
-let game = null;

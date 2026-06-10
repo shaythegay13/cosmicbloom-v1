@@ -1,5 +1,8 @@
 // Player class for Farm & Give
-class Player {
+import { TILE_SIZE } from './config.js';
+import { ui } from './ui.js';
+
+export class Player {
     constructor(data) {
         this.id = data.id || data._id;
         this.username = data.username;
@@ -10,8 +13,8 @@ class Player {
         // Position in the world
         this.x = 5;
         this.y = 5;
-        this.width = 32;
-        this.height = 32;
+        this.width = TILE_SIZE;
+        this.height = TILE_SIZE;
         
         // Movement
         this.speed = 2;
@@ -71,8 +74,8 @@ class Player {
     }
 
     draw(ctx, camera) {
-        const screenX = (this.x - camera.x) * 32;
-        const screenY = (this.y - camera.y) * 32;
+        const screenX = (this.x - camera.x) * TILE_SIZE;
+        const screenY = (this.y - camera.y) * TILE_SIZE;
 
         // Draw simple character (colored square with emoji)
         const color = this.getCharacterColor();

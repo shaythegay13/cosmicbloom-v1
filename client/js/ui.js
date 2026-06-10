@@ -1,5 +1,7 @@
 // UI Manager for Farm & Give
-class UIManager {
+import { api } from './api.js';
+
+export class UIManager {
     constructor() {
         this.currentScreen = null;
         this.modals = {};
@@ -284,5 +286,5 @@ class UIManager {
     }
 }
 
-// Create global UI instance
-const ui = new UIManager();
+// Shared UI instance
+export const ui = new UIManager();

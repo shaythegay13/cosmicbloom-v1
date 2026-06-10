@@ -1,4 +1,10 @@
 // Main entry point for Farm & Give
+import { api } from './api.js';
+import { ui } from './ui.js';
+import { Game } from './game.js';
+
+let game = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🌱 Farm & Give - Initializing...');
 
