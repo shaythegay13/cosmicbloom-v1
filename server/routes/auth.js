@@ -5,10 +5,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 
-// Generate JWT token
+const Transaction = require('../models/Transaction');
+
+// Generate JWT token (30d: mobile players must not be logged out weekly)
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: '7d'
+    expiresIn: '30d'
   });
 };
 
@@ -112,15 +114,41 @@ router.post('/login', [
 });
 
 // @route   GET /api/auth/me
-// @desc    Get current user
+// @desc    Get current user (also issues a fresh token — sliding renewal)
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
       .select('-password')
       .populate('selectedCharity');
-    
+
+    res.set('X-Refreshed-Token', generateToken(req.userId));
     res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/auth/me
+// @desc    Permanently delete the account (App Store Guideline 5.1.1(v)).
+//          Transactions are anonymized, not deleted, so charity accounting
+//          totals remain correct.
+// @access  Private (password re-verification required)
+router.delete('/me', auth, async (req, res) => {
+  try {
+    const { password } = req.body || {};
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (!password || !(await user.comparePassword(password))) {
+      return res.status(401).json({ error: 'Password is incorrect' });
+    }
+
+    await Transaction.updateMany({ user: user._id }, { $set: { user: null } });
+    await User.deleteOne({ _id: user._id });
+
+    res.json({ message: 'Account deleted' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

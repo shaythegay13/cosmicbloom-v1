@@ -145,4 +145,19 @@ function setupGameHandlers() {
         api.clearToken();
         location.reload();
     });
+
+    document.getElementById('delete-account-btn').addEventListener('click', async () => {
+        if (!confirm('Permanently delete your account and all progress? This cannot be undone.')) return;
+        const password = prompt('Enter your password to confirm deletion:');
+        if (!password) return;
+        try {
+            await api.deleteAccount(password);
+            await clearLocal();
+            api.clearToken();
+            alert('Your account has been deleted. Thank you for playing.');
+            location.reload();
+        } catch (error) {
+            ui.toast(error.message || 'Deletion failed — check your password.');
+        }
+    });
 }

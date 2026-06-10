@@ -1,0 +1,23 @@
+# Render blueprint for the Farm & Give backend + web client.
+# The build compiles the web client into www/, which the server also serves.
+services:
+  - type: web
+    name: farm-and-give
+    runtime: node
+    plan: free
+    buildCommand: PUPPETEER_SKIP_DOWNLOAD=true npm ci && npm run client:build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # set in the Render dashboard (MongoDB Atlas connection string)
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CHARITY_PERCENTAGE
+        value: "10"
+      - key: REVENUECAT_WEBHOOK_AUTH
+        sync: false # shared secret, also configured in the RevenueCat dashboard
+      - key: CLIENT_URL
+        sync: false # e.g. https://farm-and-give.onrender.com

@@ -4,7 +4,7 @@ const transactionSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    default: null // null after account deletion (transactions are anonymized)
   },
   type: {
     type: String,
@@ -27,7 +27,14 @@ const transactionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Charity'
   },
-  stripePaymentId: String,
+  provider: {
+    type: String,
+    enum: ['revenuecat', 'stripe_legacy'],
+    default: 'revenuecat'
+  },
+  providerTransactionId: String,
+  productId: String,
+  stripePaymentId: String, // legacy field, kept for old records
   status: {
     type: String,
     enum: ['pending', 'completed', 'failed', 'refunded'],
