@@ -14,7 +14,8 @@
     "scrape-gardens": "node server/scripts/scrapeGardens.js",
     "scrape-gardens-advanced": "node server/scripts/scrapeGardensPuppeteer.js",
     "scrape-all-acga": "node server/scripts/scrapeAllACGAGardens.js",
-    "scrape-locatedmap": "node server/scripts/scrapeLocatedMap.js"
+    "scrape-locatedmap": "node server/scripts/scrapeLocatedMap.js",
+    "art": "node tools/art/build.mjs"
   },
   "keywords": [
     "game",
@@ -40,6 +41,7 @@
     "stripe": "^13.5.0"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.0",
     "concurrently": "^10.0.3",
     "nodemon": "^3.0.1",
     "vite": "^8.0.16"
