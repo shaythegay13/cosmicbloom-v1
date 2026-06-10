@@ -396,3 +396,7 @@ html, body {
     #player-pill { display: none; } /* keep the top bar uncluttered on phones */
     .hud-pill { font-size: 0.8rem; padding: 7px 11px; }
 }
+
+/* IAP section */
+.iap-heading { font-size: 0.95rem; margin: 16px 0 8px; }
+.iap-item .shop-item-icon { font-size: 1.6rem; }

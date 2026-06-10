@@ -1,0 +1,27 @@
+{
+  "appId": "com.farmandgive.app",
+  "appName": "Farm & Give",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#aee3f5"
+  },
+  "android": {
+    "backgroundColor": "#aee3f5"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#fdf6e3",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#aee3f5"
+    }
+  }
+}
