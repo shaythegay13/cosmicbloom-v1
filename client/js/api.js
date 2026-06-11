@@ -1,7 +1,9 @@
 // API Client for Farm & Give
-class API {
+import { API_BASE_URL } from './config.js';
+
+export class API {
     constructor() {
-        this.baseURL = window.location.origin + '/api';
+        this.baseURL = API_BASE_URL;
         this.token = localStorage.getItem('token');
     }
 
@@ -108,25 +110,24 @@ class API {
         return this.request('/charity/my-impact');
     }
 
-    // Payment endpoints
-    async createPaymentIntent(amount, items) {
-        return this.request('/payments/create-intent', {
-            method: 'POST',
-            body: JSON.stringify({ amount, items })
-        });
-    }
-
-    async confirmPayment(transactionId, paymentIntentId) {
-        return this.request('/payments/confirm', {
-            method: 'POST',
-            body: JSON.stringify({ transactionId, paymentIntentId })
-        });
+    // Payment endpoints (purchases happen natively via RevenueCat;
+    // /sync claims server-credited coins into the local save)
+    async syncPurchases() {
+        return this.request('/payments/sync', { method: 'POST' });
     }
 
     async getPaymentHistory() {
         return this.request('/payments/history');
     }
+
+    // Account deletion (App Store Guideline 5.1.1(v))
+    async deleteAccount(password) {
+        return this.request('/auth/me', {
+            method: 'DELETE',
+            body: JSON.stringify({ password })
+        });
+    }
 }
 
-// Create global API instance
-const api = new API();
+// Shared API instance
+export const api = new API();

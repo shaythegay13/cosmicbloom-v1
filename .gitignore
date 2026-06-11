@@ -20,6 +20,7 @@ Thumbs.db
 # Build files
 client/build/
 dist/
+www/
 
 # Database
 *.db

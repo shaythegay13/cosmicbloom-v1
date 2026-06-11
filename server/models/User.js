@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema({
     },
     default: undefined
   },
+  // Legacy (schema 1) progress — kept readable so old accounts migrate
+  // client-side on first load; new saves land in gameSave below.
   gameProgress: {
     level: { type: Number, default: 1 },
     coins: { type: Number, default: 100 },
@@ -49,6 +51,18 @@ const userSchema = new mongoose.Schema({
         stage: { type: Number, default: 0 }
       }]
     }
+  },
+  // Schema-2 snapshot: the client's full save (multi-region farms,
+  // restoration scores, seeds, settings). Last-write-wins by saveVersion.
+  gameSave: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
+  // Coins purchased via IAP, credited by the RevenueCat webhook and
+  // claimed by the client through POST /api/payments/sync.
+  coinCredits: {
+    type: Number,
+    default: 0
   },
   selectedCharity: {
     type: mongoose.Schema.Types.ObjectId,

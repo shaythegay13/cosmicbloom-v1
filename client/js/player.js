@@ -1,194 +1,214 @@
-// Player class for Farm & Give
-class Player {
-    constructor(data) {
-        this.id = data.id || data._id;
-        this.username = data.username;
-        this.email = data.email;
-        this.selectedCharacter = data.selectedCharacter;
-        this.gameProgress = data.gameProgress || this.getDefaultProgress();
-        
-        // Position in the world
-        this.x = 5;
-        this.y = 5;
-        this.width = 32;
-        this.height = 32;
-        
-        // Movement
-        this.speed = 2;
-        this.direction = 'down';
-        
-        // Animation
-        this.animationFrame = 0;
-        this.animationTimer = 0;
-        this.animationSpeed = 10;
+// PlayerState: progression data + economy. Avatar: the on-screen farmer.
+import { PLAYER_SPEED, TILE_PX } from './config.js';
+import { BIOME_ORDER, getBiome } from './data/biomes.mjs';
+
+export function defaultState(character = null, username = '') {
+    return {
+        schema: 2,
+        saveVersion: 1,
+        savedAt: Date.now(),
+        username,
+        character,
+        level: 1,
+        xp: 0,
+        coins: 100,
+        currentRegion: 'prairie',
+        unlockedRegions: ['prairie'],
+        selectedSeed: 'sunflower',
+        seeds: { sunflower: 5, corn: 3 }, // starter pack
+        farms: {},
+        settings: { music: true, sfx: true },
+        tutorialStep: 0
+    };
+}
+
+export class PlayerState {
+    constructor(data, listeners = {}) {
+        Object.assign(this, defaultState(), data);
+        this.listeners = listeners; // { onChange, onLevelUp }
     }
 
-    getDefaultProgress() {
-        return {
-            level: 1,
-            coins: 100,
-            experience: 0,
-            unlockedAreas: ['starter_farm'],
-            inventory: [],
-            farm: {
-                plots: []
-            }
-        };
-    }
-
-    move(dx, dy, world) {
-        const newX = this.x + dx * this.speed;
-        const newY = this.y + dy * this.speed;
-
-        // Check boundaries
-        if (newX >= 0 && newX < world.width - 1 && 
-            newY >= 0 && newY < world.height - 1) {
-            
-            // Check collision
-            if (!world.isCollision(Math.floor(newX), Math.floor(newY))) {
-                this.x = newX;
-                this.y = newY;
-
-                // Update direction
-                if (dx > 0) this.direction = 'right';
-                else if (dx < 0) this.direction = 'left';
-                else if (dy > 0) this.direction = 'down';
-                else if (dy < 0) this.direction = 'up';
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-    update() {
-        // Update animation
-        this.animationTimer++;
-        if (this.animationTimer >= this.animationSpeed) {
-            this.animationTimer = 0;
-            this.animationFrame = (this.animationFrame + 1) % 4;
-        }
-    }
-
-    draw(ctx, camera) {
-        const screenX = (this.x - camera.x) * 32;
-        const screenY = (this.y - camera.y) * 32;
-
-        // Draw simple character (colored square with emoji)
-        const color = this.getCharacterColor();
-        ctx.fillStyle = color;
-        ctx.fillRect(screenX, screenY, this.width, this.height);
-
-        // Draw character emoji
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(
-            this.getCharacterEmoji(),
-            screenX + this.width / 2,
-            screenY + this.height / 2
-        );
-    }
-
-    getCharacterColor() {
-        const colors = {
-            sunny: '#FFD700',
-            luna: '#9370DB',
-            terra: '#8B4513',
-            river: '#4682B4',
-            sage: '#2E8B57'
-        };
-        return colors[this.selectedCharacter] || '#888888';
-    }
-
-    getCharacterEmoji() {
-        const emojis = {
-            sunny: '☀️',
-            luna: '🌙',
-            terra: '🌍',
-            river: '💧',
-            sage: '🧙'
-        };
-        return emojis[this.selectedCharacter] || '👤';
+    _changed() {
+        if (this.listeners.onChange) this.listeners.onChange(this);
     }
 
     addCoins(amount) {
-        this.gameProgress.coins += amount;
-        ui.updateHUD(this);
+        this.coins += amount;
+        this._changed();
     }
 
     spendCoins(amount) {
-        if (this.gameProgress.coins >= amount) {
-            this.gameProgress.coins -= amount;
-            ui.updateHUD(this);
-            return true;
+        if (this.coins < amount) return false;
+        this.coins -= amount;
+        this._changed();
+        return true;
+    }
+
+    xpNeeded() { return this.level * 100; }
+
+    addXp(amount) {
+        this.xp += amount;
+        while (this.xp >= this.xpNeeded()) {
+            this.xp -= this.xpNeeded();
+            this.level++;
+            if (this.listeners.onLevelUp) this.listeners.onLevelUp(this.level);
         }
-        return false;
+        this._changed();
     }
 
-    addExperience(amount) {
-        this.gameProgress.experience += amount;
-        
-        // Check for level up
-        const expNeeded = this.gameProgress.level * 100;
-        if (this.gameProgress.experience >= expNeeded) {
-            this.levelUp();
+    addSeeds(id, qty = 1) {
+        this.seeds[id] = (this.seeds[id] || 0) + qty;
+        this._changed();
+    }
+
+    takeSeed(id) {
+        if (!this.seeds[id]) return false;
+        this.seeds[id]--;
+        if (this.seeds[id] <= 0) delete this.seeds[id];
+        this._changed();
+        return true;
+    }
+
+    farm(regionId) {
+        if (!this.farms[regionId]) {
+            this.farms[regionId] = {
+                seed: Math.floor(Math.random() * 0x7fffffff),
+                restoration: 0,
+                milestonesClaimed: [],
+                plots: {}
+            };
         }
+        return this.farms[regionId];
     }
 
-    levelUp() {
-        this.gameProgress.level++;
-        this.gameProgress.experience = 0;
-        ui.updateHUD(this);
-        
-        // Show level up notification
-        console.log(`Level up! Now level ${this.gameProgress.level}`);
+    unlockRegion(regionId) {
+        const biome = getBiome(regionId);
+        if (!biome || this.unlockedRegions.includes(regionId)) return false;
+        if (!this.spendCoins(biome.unlock.coins)) return false;
+        this.unlockedRegions.push(regionId);
+        this._changed();
+        return true;
     }
 
-    addToInventory(itemId, quantity = 1) {
-        const existingItem = this.gameProgress.inventory.find(
-            item => item.itemId === itemId
-        );
-
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            this.gameProgress.inventory.push({ itemId, quantity });
-        }
-    }
-
-    removeFromInventory(itemId, quantity = 1) {
-        const item = this.gameProgress.inventory.find(
-            i => i.itemId === itemId
-        );
-
-        if (item && item.quantity >= quantity) {
-            item.quantity -= quantity;
-            if (item.quantity === 0) {
-                this.gameProgress.inventory = this.gameProgress.inventory.filter(
-                    i => i.itemId !== itemId
-                );
-            }
-            return true;
-        }
-        return false;
-    }
-
-    hasItem(itemId, quantity = 1) {
-        const item = this.gameProgress.inventory.find(
-            i => i.itemId === itemId
-        );
-        return item && item.quantity >= quantity;
-    }
-
-    getProgress() {
+    // Snapshot sent to the server / stored locally
+    serialize() {
         return {
-            level: this.gameProgress.level,
-            coins: this.gameProgress.coins,
-            experience: this.gameProgress.experience,
-            inventory: this.gameProgress.inventory,
-            farm: this.gameProgress.farm,
-            unlockedAreas: this.gameProgress.unlockedAreas
+            schema: this.schema,
+            saveVersion: this.saveVersion,
+            savedAt: this.savedAt,
+            character: this.character,
+            level: this.level,
+            xp: this.xp,
+            coins: this.coins,
+            currentRegion: this.currentRegion,
+            unlockedRegions: this.unlockedRegions,
+            selectedSeed: this.selectedSeed,
+            seeds: this.seeds,
+            farms: this.farms,
+            settings: this.settings,
+            tutorialStep: this.tutorialStep
         };
+    }
+}
+
+// Migrate a legacy (schema 1) server save into the new shape
+export function migrateLegacy(gameProgress, character) {
+    const state = defaultState(character);
+    state.level = gameProgress.level || 1;
+    state.xp = gameProgress.experience || 0;
+    state.coins = gameProgress.coins ?? 100;
+    if (gameProgress.farm && Array.isArray(gameProgress.farm.plots)) {
+        const farm = {
+            seed: 12345, restoration: 0, milestonesClaimed: [], plots: {}
+        };
+        for (const p of gameProgress.farm.plots) {
+            // legacy crops map onto prairie's crops where possible
+            const id = ['corn', 'wheat'].includes(p.crop) ? p.crop : (p.crop ? 'corn' : null);
+            farm.plots[`${p.x},${p.y}`] = {
+                tilled: true,
+                crop: id ? { id, stage: Math.min(4, p.stage || 0), stageStart: Date.now(), needsWater: true } : null
+            };
+        }
+        state.farms.prairie = farm;
+    }
+    return state;
+}
+
+const DIRS = { down: 'down', up: 'up', left: 'left', right: 'right' };
+
+export class Avatar {
+    constructor(characterId) {
+        this.characterId = characterId;
+        this.x = 15; this.y = 15;
+        this.dir = DIRS.down;
+        this.path = [];
+        this.queuedAction = null; // { x, y } farm tile to act on when adjacent
+        this.moving = false;
+        this.animT = 0;
+    }
+
+    setPath(path, queuedAction = null) {
+        this.path = path || [];
+        this.queuedAction = queuedAction;
+    }
+
+    stop() {
+        this.path = [];
+        this.queuedAction = null;
+    }
+
+    update(dt, world, keyboardVec) {
+        let vx = 0, vy = 0;
+        if (keyboardVec.x || keyboardVec.y) {
+            // direct control overrides pathing
+            this.path = [];
+            const len = Math.hypot(keyboardVec.x, keyboardVec.y) || 1;
+            vx = (keyboardVec.x / len) * PLAYER_SPEED;
+            vy = (keyboardVec.y / len) * PLAYER_SPEED;
+            const nx = this.x + vx * dt, ny = this.y + vy * dt;
+            if (world.isWalkable(nx, this.y)) this.x = nx;
+            if (world.isWalkable(this.x, ny)) this.y = ny;
+        } else if (this.path.length) {
+            const next = this.path[0];
+            const dx = next.x - this.x, dy = next.y - this.y;
+            const dist = Math.hypot(dx, dy);
+            const step = PLAYER_SPEED * dt;
+            if (dist <= step) {
+                this.x = next.x; this.y = next.y;
+                this.path.shift();
+            } else {
+                vx = (dx / dist) * PLAYER_SPEED;
+                vy = (dy / dist) * PLAYER_SPEED;
+                this.x += vx * dt;
+                this.y += vy * dt;
+            }
+        }
+
+        this.moving = !!(vx || vy || this.path.length);
+        if (vx || vy) {
+            if (Math.abs(vx) > Math.abs(vy)) this.dir = vx > 0 ? 'right' : 'left';
+            else if (vy !== 0) this.dir = vy > 0 ? 'down' : 'up';
+        }
+        this.animT += dt * (this.moving ? 7 : 2.5);
+    }
+
+    arrived() {
+        return this.path.length === 0;
+    }
+
+    isAdjacentTo(x, y) {
+        return Math.abs(Math.round(this.x) - x) + Math.abs(Math.round(this.y) - y) <= 1;
+    }
+
+    frameName() {
+        const f = this.moving ? (1 + (Math.floor(this.animT) % 2)) : 0;
+        return `char/${this.characterId}/${this.dir}/${f}`;
+    }
+
+    draw(ctx, coreAtlas, camera) {
+        const s = camera.toScreen(this.x, this.y);
+        coreAtlas.draw(ctx, 'ind/shadow', s.x, s.y + 4);
+        const bob = this.moving ? 0 : Math.sin(this.animT) * 1.5;
+        coreAtlas.draw(ctx, this.frameName(), s.x, s.y - TILE_PX * 0.15 + bob);
     }
 }

@@ -80,29 +80,43 @@ router.post('/select-character', auth, async (req, res) => {
   }
 });
 
+// Loose sanity caps for the schema-2 snapshot (single-player game — the
+// goal is rejecting corrupt/abusive payloads, not perfect anti-cheat).
+function validateSnapshot(save) {
+  if (!save || typeof save !== 'object' || save.schema !== 2) return 'bad schema';
+  if (typeof save.coins !== 'number' || save.coins < 0 || save.coins > 100000000) return 'bad coins';
+  if (typeof save.level !== 'number' || save.level < 1 || save.level > 1000) return 'bad level';
+  if (save.farms && typeof save.farms !== 'object') return 'bad farms';
+  for (const farm of Object.values(save.farms || {})) {
+    if (typeof farm.restoration !== 'number' || farm.restoration < 0 || farm.restoration > 100) {
+      return 'bad restoration';
+    }
+    if (farm.plots && Object.keys(farm.plots).length > 1000) return 'too many plots';
+  }
+  if (JSON.stringify(save).length > 300000) return 'snapshot too large';
+  return null;
+}
+
 // @route   POST /api/game/save
-// @desc    Save game progress
+// @desc    Save game progress (schema-2 snapshot, last-write-wins)
 // @access  Private
 router.post('/save', auth, async (req, res) => {
   try {
     const { gameProgress } = req.body;
+    const error = validateSnapshot(gameProgress);
+    if (error) return res.status(400).json({ error: `Invalid save: ${error}` });
 
-    const user = await User.findById(req.userId);
-    
-    // Update game progress
-    if (gameProgress.level) user.gameProgress.level = gameProgress.level;
-    if (gameProgress.coins !== undefined) user.gameProgress.coins = gameProgress.coins;
-    if (gameProgress.experience !== undefined) user.gameProgress.experience = gameProgress.experience;
-    if (gameProgress.inventory) user.gameProgress.inventory = gameProgress.inventory;
-    if (gameProgress.farm) user.gameProgress.farm = gameProgress.farm;
-    if (gameProgress.unlockedAreas) user.gameProgress.unlockedAreas = gameProgress.unlockedAreas;
+    const user = await User.findById(req.userId).select('gameSave');
+    // last-write-wins by saveVersion: ignore stale snapshots from another device
+    if (user.gameSave && (user.gameSave.saveVersion || 0) > (gameProgress.saveVersion || 0)) {
+      return res.json({ message: 'Stale save ignored', saveVersion: user.gameSave.saveVersion });
+    }
 
+    user.gameSave = gameProgress;
+    user.markModified('gameSave');
     await user.save();
 
-    res.json({
-      message: 'Game saved successfully',
-      gameProgress: user.gameProgress
-    });
+    res.json({ message: 'Game saved', saveVersion: gameProgress.saveVersion });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -110,14 +124,15 @@ router.post('/save', auth, async (req, res) => {
 });
 
 // @route   GET /api/game/load
-// @desc    Load game progress
+// @desc    Load game progress (schema-2 if present, else legacy schema-1)
 // @access  Private
 router.get('/load', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('gameProgress selectedCharacter');
-    
+    const user = await User.findById(req.userId)
+      .select('gameSave gameProgress selectedCharacter');
+
     res.json({
-      gameProgress: user.gameProgress,
+      gameProgress: user.gameSave || user.gameProgress,
       selectedCharacter: user.selectedCharacter,
       character: characters.find(c => c.id === user.selectedCharacter)
     });
