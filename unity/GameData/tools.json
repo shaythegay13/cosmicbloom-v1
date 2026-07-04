@@ -2,9 +2,12 @@
   "tools": [
     { "id": "cosmic_hoe", "name": "Cosmic Hoe", "action": "till", "tier": 1, "cost": 0, "unlockLevel": 1, "notes": "Starting tool. Tills one plot per tap." },
     { "id": "cosmic_hoe_2", "name": "Cosmic Hoe II", "action": "till", "tier": 2, "cost": 500, "unlockLevel": 6, "notes": "Clears overgrown land in one hit and tills a 1x2 area." },
+    { "id": "cosmic_hoe_3", "name": "Comet Plow", "action": "till", "tier": 3, "cost": 2200, "unlockLevel": 14, "notes": "Tills a 3x1 row and clears debris in the same swing." },
     { "id": "watering_can", "name": "Watering Can", "action": "water", "tier": 1, "cost": 0, "unlockLevel": 1, "notes": "Starting tool. Waters one plot." },
     { "id": "solar_watering_can", "name": "Solar Watering Can", "action": "water", "tier": 2, "cost": 1200, "unlockLevel": 9, "notes": "Sun Garden unlock. Auto-waters adjacent plots during daytime." },
+    { "id": "nebula_mister", "name": "Nebula Mister", "action": "water", "tier": 3, "cost": 3000, "unlockLevel": 16, "notes": "Waters a 3x3 area with glittering nebula mist. Works at night." },
     { "id": "axe", "name": "Axe", "action": "clear", "tier": 1, "cost": 0, "unlockLevel": 1, "notes": "Quest reward. Clears debris, vines and dead wood." },
+    { "id": "star_scythe", "name": "Star Scythe", "action": "harvest", "tier": 1, "cost": 350, "unlockLevel": 4, "notes": "Harvests a 1x2 area in one sweep." },
     { "id": "alien_harvester", "name": "Alien Harvester", "action": "harvest", "tier": 2, "cost": 2500, "unlockLevel": 12, "notes": "Harvests all ready crops in a 3x3 area." },
     { "id": "fishing_rod", "name": "Fishing Rod", "action": "fish", "tier": 1, "cost": 0, "unlockLevel": 1, "notes": "Quest reward after restoring the Moonlit Pond." }
   ]

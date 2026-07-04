@@ -58,6 +58,7 @@ namespace CosmicBloom.Data
     {
         public string id;
         public string name;
+        public string region;      // region id the NPC lives in
         public string role;
         public string personality;
         public string activeAt;    // day | night | any
@@ -75,6 +76,7 @@ namespace CosmicBloom.Data
         public string landmark;
         public string region;
         public string item;
+        public string animal;
         public string target;
         public string @event;
         public List<string> npcs;

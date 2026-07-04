@@ -137,7 +137,10 @@ Collect a rare seed from each garden, host the **Cosmic Festival**, plant the
 
 ---
 
-## 5. NPC roster
+## 5. Cast & content scale
+
+**50 NPCs — 10 per region** (full roster with dialogue in
+`unity/GameData/npcs.json`). The core story cast:
 
 | Name | Role | Personality | Story role |
 |---|---|---|---|
@@ -146,6 +149,21 @@ Collect a rare seed from each garden, host the **Cosmic Festival**, plant the
 | **Orbit** | Space-rock collector | Mischievous, energetic | Clan stories; unlocks cosmic events |
 | **Elder Nova** | Wise elder | Calm, mysterious | Clan history; guides restoration |
 | **Captain Pebble** | Space pirate | Gruff but kind | Trading and exploration side quests |
+
+Each region adds its own supporting cast (forge keepers, moth shepherds,
+talking courier hounds, sky chefs…) — flavor NPCs today, side-quest givers
+as content grows.
+
+**Content database totals** (`unity/GameData/`):
+
+| Content | Count |
+|---|---|
+| Quests | 60 — 15 per act |
+| NPCs | 50 — 10 per region |
+| Crops | 25 farmable + the Heartseed (quest-only finale crop) |
+| Animals | 15 (6 livestock, 6 pets, 3 helpers) |
+| Tools | 10 (3 till / 3 water / 2 harvest / clear / fish) |
+| Regions | 5 (Starlight Vale + Four Sacred Gardens) |
 
 ---
 
