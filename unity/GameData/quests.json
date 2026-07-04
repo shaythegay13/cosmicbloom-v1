@@ -1,0 +1,196 @@
+{
+  "quests": [
+    {
+      "id": "q_arrival",
+      "act": 1,
+      "title": "The Arrival",
+      "giver": null,
+      "summary": "A mysterious guide welcomes you to the fading Starlight Vale.",
+      "steps": [
+        { "type": "cutscene", "id": "opening_guide" },
+        { "type": "move_to", "target": "starting_plot" }
+      ],
+      "rewards": { "coins": 0, "xp": 10, "items": ["cosmic_hoe", "watering_can"] },
+      "unlocks": "q_first_sprout"
+    },
+    {
+      "id": "q_first_sprout",
+      "act": 1,
+      "title": "First Sprout",
+      "giver": "zyx",
+      "summary": "Clear 3 overgrown plots and plant 5 Starlight Berries.",
+      "steps": [
+        { "type": "clear_plots", "count": 3 },
+        { "type": "plant_crop", "crop": "starlight_berry", "count": 5 },
+        { "type": "harvest_crop", "crop": "starlight_berry", "count": 1 }
+      ],
+      "rewards": { "coins": 50, "xp": 25, "items": ["axe"] },
+      "unlocks": "q_soil_secrets"
+    },
+    {
+      "id": "q_soil_secrets",
+      "act": 1,
+      "title": "Soil Secrets",
+      "giver": "zyx",
+      "summary": "Zyx teaches soil health: plant Cosmic Clover on a tired plot and watch it recover.",
+      "steps": [
+        { "type": "plant_crop", "crop": "clover_cover", "count": 2 },
+        { "type": "soil_above", "threshold": 60, "count": 2 }
+      ],
+      "rewards": { "coins": 40, "xp": 20 },
+      "unlocks": "q_moonlit_pond"
+    },
+    {
+      "id": "q_moonlit_pond",
+      "act": 1,
+      "title": "The Moonlit Pond",
+      "giver": "lumina",
+      "summary": "Restore the dried-up pond to bring water — and fishing — back to the Vale.",
+      "steps": [
+        { "type": "restore_landmark", "landmark": "moonlit_pond" }
+      ],
+      "rewards": { "coins": 100, "xp": 50, "items": ["fishing_rod"] },
+      "unlocks": "q_first_friend"
+    },
+    {
+      "id": "q_first_friend",
+      "act": 1,
+      "title": "A Companion",
+      "giver": "zyx",
+      "summary": "Reach 25% Vale restoration — a bioluminescent fox has been watching you work.",
+      "steps": [
+        { "type": "restoration_above", "region": "starlight_vale", "threshold": 25 }
+      ],
+      "rewards": { "coins": 75, "xp": 40, "items": ["pet_biolume_fox"] },
+      "unlocks": "q_journals"
+    },
+    {
+      "id": "q_journals",
+      "act": 2,
+      "title": "Voices in the Dirt",
+      "giver": "elder_nova",
+      "summary": "Find the first three journals of the Starlight Clan scattered across the Vale.",
+      "steps": [
+        { "type": "collect", "item": "clan_journal", "count": 3 }
+      ],
+      "rewards": { "coins": 120, "xp": 60 },
+      "unlocks": "q_meteor_mystery"
+    },
+    {
+      "id": "q_lost_seed",
+      "act": 2,
+      "title": "The Lost Seed",
+      "giver": "orbit",
+      "summary": "A rare seed is hidden in the crystal cave. Orbit swears it isn't one of his rocks.",
+      "steps": [
+        { "type": "explore", "target": "crystal_cave" },
+        { "type": "collect", "item": "rare_seed", "count": 1 }
+      ],
+      "rewards": { "coins": 150, "xp": 70 },
+      "unlocks": null
+    },
+    {
+      "id": "q_meteor_mystery",
+      "act": 2,
+      "title": "The Meteor Mystery",
+      "giver": "orbit",
+      "summary": "Strange lights over the ridge. Investigate the crash site during the night.",
+      "steps": [
+        { "type": "wait_for", "event": "meteor_shower" },
+        { "type": "explore", "target": "crash_site" }
+      ],
+      "rewards": { "coins": 200, "xp": 90 },
+      "unlocks": "q_festival"
+    },
+    {
+      "id": "q_greenhouse_repair",
+      "act": 2,
+      "title": "Glass and Vines",
+      "giver": "lumina",
+      "summary": "Repair the broken greenhouse so Lumina can begin her research.",
+      "steps": [
+        { "type": "restore_landmark", "landmark": "broken_greenhouse" }
+      ],
+      "rewards": { "coins": 180, "xp": 80 },
+      "unlocks": "q_arboretum"
+    },
+    {
+      "id": "q_arboretum",
+      "act": 2,
+      "title": "The Celestial Arboretum",
+      "giver": "lumina",
+      "summary": "Restore the arboretum and read what the Starlight Clan left behind.",
+      "steps": [
+        { "type": "restore_landmark", "landmark": "celestial_arboretum" }
+      ],
+      "rewards": { "coins": 300, "xp": 120 },
+      "unlocks": "q_festival"
+    },
+    {
+      "id": "q_festival",
+      "act": 2,
+      "title": "Festival Preparation",
+      "giver": "elder_nova",
+      "summary": "Organize the first festival the Vale has seen in a generation.",
+      "steps": [
+        { "type": "harvest_any", "count": 20 },
+        { "type": "talk_to", "npcs": ["zyx", "lumina", "orbit", "captain_pebble"] }
+      ],
+      "rewards": { "coins": 400, "xp": 150, "items": ["festival_lantern"] },
+      "unlocks": "q_great_tree"
+    },
+    {
+      "id": "q_trade_routes",
+      "act": 2,
+      "title": "Trade Routes",
+      "giver": "captain_pebble",
+      "summary": "Fill Pebble's hold: sell him 10 crops of at least 3 different kinds.",
+      "steps": [
+        { "type": "sell_distinct", "kinds": 3, "count": 10 }
+      ],
+      "rewards": { "coins": 250, "xp": 100 },
+      "unlocks": "q_hidden_biome"
+    },
+    {
+      "id": "q_hidden_biome",
+      "act": 3,
+      "title": "Charts to Nowhere",
+      "giver": "captain_pebble",
+      "summary": "Pebble's old charts hint at the Sun Garden. Unlock your first Sacred Garden.",
+      "steps": [
+        { "type": "unlock_region", "region": "sun_garden" }
+      ],
+      "rewards": { "coins": 300, "xp": 150 },
+      "unlocks": null
+    },
+    {
+      "id": "q_great_tree",
+      "act": 3,
+      "title": "The Sleeping Tree",
+      "giver": "lumina",
+      "summary": "Gather a sacred seed from each of the Four Gardens.",
+      "steps": [
+        { "type": "harvest_crop", "crop": "solar_pepper", "count": 1 },
+        { "type": "harvest_crop", "crop": "moon_melon", "count": 1 },
+        { "type": "harvest_crop", "crop": "starfruit", "count": 1 },
+        { "type": "harvest_crop", "crop": "nebula_pepper", "count": 1 }
+      ],
+      "rewards": { "coins": 1000, "xp": 400, "items": ["heartseed"] },
+      "unlocks": "q_heartseed"
+    },
+    {
+      "id": "q_heartseed",
+      "act": 3,
+      "title": "Infinite Bloom",
+      "giver": "elder_nova",
+      "summary": "Host the Cosmic Festival and plant the Heartseed at the roots of the Great Cosmic Tree.",
+      "steps": [
+        { "type": "restore_landmark", "landmark": "heartseed_roots" },
+        { "type": "plant_crop", "crop": "heartseed", "count": 1 },
+        { "type": "harvest_crop", "crop": "heartseed", "count": 1 }
+      ],
+      "rewards": { "coins": 5000, "xp": 2000, "items": ["ending_cutscene"] },
+      "unlocks": null
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # 🌍 Farm & Give — Rewind the Planet
 
+> **🚀 Project pivot in progress:** this game is being rebuilt in **Unity 6**
+> as **Cosmic Bloom: Starlight Rewilding** — see `COSMIC_BLOOM_GDD.md` for the
+> new design and `unity/` for the engine-ready content data + C# starter kit.
+> The Node/Express backend below is carried forward unchanged; the web client
+> in `client/` is the completed v1 and remains playable as a reference.
+
 A cozy farming game for iOS, Android and the web. Travel to seven regions
 around the world, start farms in each, and **rewind** worn-down landscapes
 back to life — barren dirt turns to lush meadow, dead trees bloom, and

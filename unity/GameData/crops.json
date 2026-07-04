@@ -1,0 +1,25 @@
+{
+  "crops": [
+    { "id": "starlight_berry", "name": "Starlight Berry", "region": "starlight_vale", "archetype": "bush", "color": "#8fd4ff", "leafColor": "#4e8f5a", "seedPrice": 5, "sellPrice": 12, "growMinutes": 5, "stages": 4, "restore": 3, "xp": 5, "soilDrain": 8, "growsAt": "any", "native": true, "notes": "Tutorial crop. Glows softly at night." },
+    { "id": "wheat", "name": "Wheat", "region": "starlight_vale", "archetype": "stalk", "color": "#e0b25c", "leafColor": "#b7a45a", "seedPrice": 6, "sellPrice": 13, "growMinutes": 8, "stages": 4, "restore": 2, "xp": 4, "soilDrain": 10, "growsAt": "day", "native": false },
+    { "id": "carrot", "name": "Carrot", "region": "starlight_vale", "archetype": "root", "color": "#ec8a3c", "leafColor": "#4f9a3c", "seedPrice": 8, "sellPrice": 18, "growMinutes": 10, "stages": 4, "restore": 2, "xp": 5, "soilDrain": 10, "growsAt": "day", "native": false },
+    { "id": "clover_cover", "name": "Cosmic Clover", "region": "starlight_vale", "archetype": "flower", "color": "#6fd48a", "leafColor": "#4e8f5a", "seedPrice": 4, "sellPrice": 2, "growMinutes": 12, "stages": 3, "restore": 1, "xp": 2, "soilDrain": -25, "growsAt": "any", "native": false, "notes": "Cover crop: restores soil instead of draining it." },
+
+    { "id": "solar_pepper", "name": "Solar Pepper", "region": "sun_garden", "archetype": "bush", "color": "#f5533b", "leafColor": "#5d9e3f", "seedPrice": 20, "sellPrice": 48, "growMinutes": 20, "stages": 4, "restore": 3, "xp": 9, "soilDrain": 12, "growsAt": "day", "native": true },
+    { "id": "sunwheat", "name": "Sunwheat", "region": "sun_garden", "archetype": "stalk", "color": "#f7c948", "leafColor": "#c9a13f", "seedPrice": 15, "sellPrice": 34, "growMinutes": 15, "stages": 4, "restore": 2, "xp": 7, "soilDrain": 10, "growsAt": "day", "native": false },
+    { "id": "heliotrope", "name": "Heliotrope Bloom", "region": "sun_garden", "archetype": "flower", "color": "#ffb13b", "leafColor": "#6e9460", "seedPrice": 18, "sellPrice": 42, "growMinutes": 25, "stages": 4, "restore": 4, "xp": 8, "soilDrain": 8, "growsAt": "day", "native": false },
+
+    { "id": "moon_melon", "name": "Moon Melon", "region": "moon_garden", "archetype": "vine", "color": "#bfe8ff", "leafColor": "#5c5f7d", "seedPrice": 30, "sellPrice": 72, "growMinutes": 30, "stages": 4, "restore": 3, "xp": 12, "soilDrain": 14, "growsAt": "night", "native": true },
+    { "id": "glowcap", "name": "Glowcap Mushroom", "region": "moon_garden", "archetype": "bush", "color": "#7de8d8", "leafColor": "#4a4a5e", "seedPrice": 22, "sellPrice": 50, "growMinutes": 18, "stages": 3, "restore": 3, "xp": 9, "soilDrain": 6, "growsAt": "night", "native": false },
+    { "id": "nightbloom", "name": "Nightbloom", "region": "moon_garden", "archetype": "flower", "color": "#9a7fd1", "leafColor": "#3a3a54", "seedPrice": 26, "sellPrice": 60, "growMinutes": 24, "stages": 4, "restore": 4, "xp": 10, "soilDrain": 9, "growsAt": "night", "native": false },
+
+    { "id": "astral_corn", "name": "Astral Corn", "region": "star_garden", "archetype": "stalk", "color": "#ffe28f", "leafColor": "#6a68a8", "seedPrice": 40, "sellPrice": 95, "growMinutes": 35, "stages": 5, "restore": 3, "xp": 15, "soilDrain": 14, "growsAt": "any", "native": false },
+    { "id": "starfruit", "name": "Constellation Starfruit", "region": "star_garden", "archetype": "vine", "color": "#ffd54f", "leafColor": "#4d4a74", "seedPrice": 55, "sellPrice": 140, "growMinutes": 45, "stages": 5, "restore": 5, "xp": 20, "soilDrain": 16, "growsAt": "night", "native": true, "notes": "Forms a star pattern at final stage; contributes to constellation events." },
+
+    { "id": "nebula_pepper", "name": "Nebula Pepper", "region": "nebula_garden", "archetype": "bush", "color": "#e05ad8", "leafColor": "#6a3a78", "seedPrice": 70, "sellPrice": 175, "growMinutes": 50, "stages": 5, "restore": 4, "xp": 24, "soilDrain": 16, "growsAt": "any", "native": true },
+    { "id": "biolume_vine", "name": "Biolume Vine", "region": "nebula_garden", "archetype": "vine", "color": "#5ae0c8", "leafColor": "#4e2a5a", "seedPrice": 60, "sellPrice": 150, "growMinutes": 40, "stages": 4, "restore": 5, "xp": 20, "soilDrain": 12, "growsAt": "night", "native": false },
+    { "id": "comet_cabbage", "name": "Comet Cabbage", "region": "nebula_garden", "archetype": "root", "color": "#a8e6ff", "leafColor": "#9a4fb0", "seedPrice": 45, "sellPrice": 105, "growMinutes": 28, "stages": 4, "restore": 3, "xp": 16, "soilDrain": 12, "growsAt": "day", "native": false },
+
+    { "id": "heartseed", "name": "The Heartseed", "region": "nebula_garden", "archetype": "flower", "color": "#ff8fd4", "leafColor": "#5fae62", "seedPrice": 0, "sellPrice": 0, "growMinutes": 60, "stages": 6, "restore": 100, "xp": 500, "soilDrain": 0, "growsAt": "any", "native": false, "notes": "Quest item — finale crop planted at the Great Cosmic Tree. Not purchasable." }
+  ]
+}

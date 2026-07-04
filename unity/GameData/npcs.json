@@ -1,0 +1,79 @@
+{
+  "npcs": [
+    {
+      "id": "zyx",
+      "name": "Zyx",
+      "role": "Alien Farmer",
+      "personality": "Curious, playful",
+      "activeAt": "day",
+      "home": "zyx_house",
+      "palette": { "body": "#7de88a", "accent": "#f5c33b" },
+      "questIds": ["q_first_sprout", "q_soil_secrets", "q_first_friend"],
+      "dialogue": {
+        "intro": "Oh! A new gardener! The Vale picked a good one, I can feel it. I'm Zyx — I'll show you which end of the hoe goes down!",
+        "idle_day": "Starlight Berries love this soil. Well... they used to. We'll get it back!",
+        "quest_complete": "Look at that! The dirt's practically humming."
+      }
+    },
+    {
+      "id": "lumina",
+      "name": "Lumina",
+      "role": "Botanist",
+      "personality": "Shy, dreamy",
+      "activeAt": "day",
+      "home": "lumina_greenhouse",
+      "palette": { "body": "#c8a8e8", "accent": "#7de8d8" },
+      "questIds": ["q_greenhouse_repair", "q_arboretum", "q_great_tree"],
+      "dialogue": {
+        "intro": "Oh — hello. Sorry, I was talking to the ferns. They say the Great Cosmic Tree isn't dead. Just... sleeping.",
+        "idle_day": "Every plant you revive makes the Tree stir a little. I've seen it in my readings.",
+        "quest_complete": "The vines are glowing again... I could cry. I am crying. Ignore that."
+      }
+    },
+    {
+      "id": "orbit",
+      "name": "Orbit",
+      "role": "Space Rock Collector",
+      "personality": "Mischievous, energetic",
+      "activeAt": "night",
+      "home": "orbit_crater",
+      "palette": { "body": "#8fb4ff", "accent": "#ff8fd4" },
+      "questIds": ["q_meteor_mystery", "q_lost_seed"],
+      "dialogue": {
+        "intro": "Psst. You. New gardener. Wanna see a rock older than the stars? 'Course you do. Everyone does.",
+        "idle_night": "Meteor shower's coming. I can smell it. Rocks have a smell, don't argue.",
+        "quest_complete": "This is going STRAIGHT into the collection. Top shelf. Maybe middle shelf."
+      }
+    },
+    {
+      "id": "elder_nova",
+      "name": "Elder Nova",
+      "role": "Wise Elder",
+      "personality": "Calm, mysterious",
+      "activeAt": "any",
+      "home": "nova_hollow",
+      "palette": { "body": "#e8d8a8", "accent": "#9a7fd1" },
+      "questIds": ["q_journals", "q_festival", "q_heartseed"],
+      "dialogue": {
+        "intro": "The Starlight Clan planted more than crops, child. They planted memory. Dig gently.",
+        "idle_day": "Each journal you find returns a name to the sky.",
+        "quest_complete": "So the old light remembers us after all."
+      }
+    },
+    {
+      "id": "captain_pebble",
+      "name": "Captain Pebble",
+      "role": "Space Pirate",
+      "personality": "Gruff but kind",
+      "activeAt": "day",
+      "home": "market_dock",
+      "palette": { "body": "#c88a5a", "accent": "#5ae0c8" },
+      "questIds": ["q_trade_routes", "q_hidden_biome"],
+      "dialogue": {
+        "intro": "Cap'n Pebble. I haul seeds across three nebulas. You grow 'em good, I'll pay good. That's the whole speech.",
+        "idle_day": "Prices are fair today. Fairer if you don't haggle.",
+        "quest_complete": "Not bad, dirt-hand. Not bad at all."
+      }
+    }
+  ]
+}

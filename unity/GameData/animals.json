@@ -1,0 +1,10 @@
+{
+  "animals": [
+    { "id": "chicken", "name": "Star Chicken", "kind": "livestock", "produce": "glowing_egg", "produceMinutes": 30, "cost": 200, "unlockLevel": 3, "palette": { "body": "#f2ead8", "accent": "#8fd4ff" }, "notes": "Lays softly glowing eggs. Sell or cook." },
+    { "id": "sheep", "name": "Constellation Sheep", "kind": "livestock", "produce": "star_wool", "produceMinutes": 60, "cost": 450, "unlockLevel": 6, "palette": { "body": "#e8e8f5", "accent": "#ffd54f" }, "notes": "Wool patterned like the night sky." },
+    { "id": "biolume_fox", "name": "Biolume Fox", "kind": "pet", "produce": null, "cost": 0, "unlockLevel": 1, "palette": { "body": "#5ae0c8", "accent": "#ff8fd4" }, "notes": "Quest reward pet. Deters pests on the plots it patrols." },
+    { "id": "glow_axolotl", "name": "Glow Axolotl", "kind": "pet", "produce": null, "cost": 800, "unlockLevel": 10, "palette": { "body": "#ffb3d9", "accent": "#7de8d8" }, "notes": "Lives in the restored Moonlit Pond. Boosts fishing luck." },
+    { "id": "star_slime", "name": "Star Slime", "kind": "pet", "produce": "stardust", "produceMinutes": 120, "cost": 1500, "unlockLevel": 14, "palette": { "body": "#ffd54f", "accent": "#e05ad8" }, "notes": "Occasionally drops stardust used for tool upgrades." },
+    { "id": "bee_swarm", "name": "Comet Bees", "kind": "helper", "produce": "star_honey", "produceMinutes": 90, "cost": 600, "unlockLevel": 8, "palette": { "body": "#f5c33b", "accent": "#8fb4ff" }, "notes": "Pollinators: +15% yield to crops within range and spread wildflowers." }
+  ]
+}

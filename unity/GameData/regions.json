@@ -1,0 +1,81 @@
+{
+  "regions": [
+    {
+      "id": "starlight_vale",
+      "name": "Starlight Vale",
+      "act": 1,
+      "unlockCoins": 0,
+      "unlockLevel": 1,
+      "description": "Your inherited farm. Overgrown plots, a broken greenhouse, and the dried-up Moonlit Pond.",
+      "skyColor": "#2b2140",
+      "groundTiers": ["#6e5a44", "#7d8a52", "#5fae62"],
+      "ambientTints": ["#3a2f4d", "#2e2a44", "#241f38"],
+      "landmarks": [
+        { "id": "broken_greenhouse", "name": "Broken Greenhouse", "restoreCost": 250, "unlocks": "greenhouse_farming" },
+        { "id": "moonlit_pond", "name": "Moonlit Pond", "restoreCost": 400, "unlocks": "fishing" },
+        { "id": "celestial_arboretum", "name": "Celestial Arboretum", "restoreCost": 900, "unlocks": "lore_journal_2" }
+      ],
+      "milestones": [25, 50, 75, 100]
+    },
+    {
+      "id": "sun_garden",
+      "name": "Sun Garden",
+      "act": 3,
+      "unlockCoins": 1500,
+      "unlockLevel": 8,
+      "description": "Scorched terraces where heat-resistant crops thrive. Home of solar-powered tools.",
+      "skyColor": "#f5a03b",
+      "groundTiers": ["#8a6a3e", "#a3823f", "#c9a13f"],
+      "ambientTints": ["#5a3a20", "#4d3d1e", "#3f3418"],
+      "landmarks": [
+        { "id": "solar_forge", "name": "Solar Forge", "restoreCost": 1200, "unlocks": "solar_watering_can" }
+      ],
+      "milestones": [25, 50, 75, 100]
+    },
+    {
+      "id": "moon_garden",
+      "name": "Moon Garden",
+      "act": 3,
+      "unlockCoins": 2500,
+      "unlockLevel": 12,
+      "description": "A silver grove where crops grow only under moonlight and glowcaps light the paths.",
+      "skyColor": "#1a1a3a",
+      "groundTiers": ["#4a4a5e", "#5c5f7d", "#7d84b8"],
+      "ambientTints": ["#141428", "#181835", "#1c1c42"],
+      "landmarks": [
+        { "id": "lunar_observatory", "name": "Lunar Observatory", "restoreCost": 2000, "unlocks": "night_vision_lanterns" }
+      ],
+      "milestones": [25, 50, 75, 100]
+    },
+    {
+      "id": "star_garden",
+      "name": "Star Garden",
+      "act": 3,
+      "unlockCoins": 4000,
+      "unlockLevel": 16,
+      "description": "Constellation crops bloom into star patterns here, re-lighting the sky one harvest at a time.",
+      "skyColor": "#0e1030",
+      "groundTiers": ["#3a3654", "#4d4a74", "#6a68a8"],
+      "ambientTints": ["#0c0c22", "#10102c", "#141438"],
+      "landmarks": [
+        { "id": "stargazers_rest", "name": "Stargazer's Rest", "restoreCost": 3200, "unlocks": "stargazing_events" }
+      ],
+      "milestones": [25, 50, 75, 100]
+    },
+    {
+      "id": "nebula_garden",
+      "name": "Nebula Garden",
+      "act": 3,
+      "unlockCoins": 6000,
+      "unlockLevel": 20,
+      "description": "Floating islands wrapped in pink nebula mist. Bioluminescent plants and zero-gravity plots.",
+      "skyColor": "#3a1440",
+      "groundTiers": ["#4e2a5a", "#6a3a78", "#9a4fb0"],
+      "ambientTints": ["#2a0e30", "#331240", "#3d1650"],
+      "landmarks": [
+        { "id": "heartseed_roots", "name": "Roots of the Great Cosmic Tree", "restoreCost": 8000, "unlocks": "heartseed_finale" }
+      ],
+      "milestones": [25, 50, 75, 100]
+    }
+  ]
+}
