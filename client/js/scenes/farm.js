@@ -38,7 +38,12 @@ export class FarmScene {
     }
 
     resize() {
+        const firstLayout = this.camera.wPx === 0 || this.camera.hPx === 0;
         this.camera.resize(this.game.viewWidth, this.game.viewHeight);
+        if (firstLayout && this.camera.wPx > 0 && this.camera.hPx > 0) {
+            this.camera.x = this.avatar.x - this.camera.wPx / TILE_PX / 2;
+            this.camera.y = this.avatar.y - this.camera.hPx / TILE_PX / 2;
+        }
         this.camera.clamp(this.world);
     }
 
