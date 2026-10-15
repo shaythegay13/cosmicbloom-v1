@@ -148,6 +148,21 @@ describe.skipIf(SKIP)('API', () => {
         expect(history.body[0].status).toBe('refunded');
     });
 
+    it('does not treat named charity paths as ids', async () => {
+        const mine = await request(app)
+            .get('/api/charity/my-impact')
+            .set('Authorization', `Bearer ${token}`);
+        expect(mine.status).toBe(200);
+        expect(mine.body.totalContributed).toBe(0);
+
+        const stats = await request(app).get('/api/charity/stats/impact');
+        expect(stats.status).toBe(200);
+        expect(stats.body).toHaveProperty('totalDonated');
+
+        const nearest = await request(app).get('/api/charity/nearest');
+        expect(nearest.status).toBe(400);
+    });
+
     it('requires the right password to delete an account, then deletes it', async () => {
         const wrong = await request(app)
             .delete('/api/auth/me')

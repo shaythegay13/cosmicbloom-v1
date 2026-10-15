@@ -30,24 +30,6 @@ router.get('/organizations', async (req, res) => {
   }
 });
 
-// @route   GET /api/charity/:id
-// @desc    Get single charity organization
-// @access  Public
-router.get('/:id', async (req, res) => {
-  try {
-    const charity = await Charity.findById(req.params.id);
-    
-    if (!charity) {
-      return res.status(404).json({ error: 'Charity not found' });
-    }
-
-    res.json(charity);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
 // @route   POST /api/charity/select
 // @desc    Select user's preferred charity
 // @access  Private
@@ -181,6 +163,26 @@ router.get('/nearest', async (req, res) => {
       count: results.length,
       gardens: results
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Registered last so "my-impact", "nearest", and "stats/impact" are not
+// captured as charity ids.
+// @route   GET /api/charity/:id
+// @desc    Get single charity organization
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const charity = await Charity.findById(req.params.id);
+
+    if (!charity) {
+      return res.status(404).json({ error: 'Charity not found' });
+    }
+
+    res.json(charity);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

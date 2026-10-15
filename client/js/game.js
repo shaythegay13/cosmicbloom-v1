@@ -206,6 +206,9 @@ export class Game {
 
     // ---- loop -------------------------------------------------------------
     start() {
+        // init() measures the canvas while #game-screen is still display:none,
+        // which reports 0×0. Measure again now that the screen is visible.
+        this._resize();
         this.running = true;
         this._lastTime = performance.now();
         requestAnimationFrame(t => this._frame(t));
